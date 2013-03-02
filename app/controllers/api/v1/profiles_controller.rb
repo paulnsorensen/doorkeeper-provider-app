@@ -1,7 +1,7 @@
 module Api::V1
   class ProfilesController < ApiController
-    doorkeeper_for :index
-    doorkeeper_for :create, :scopes => [:write]
+    ensure_authenticated_user_for :index
+    ensure_authenticated_user_for :create, :scopes => [:write]
 
     respond_to :json
 

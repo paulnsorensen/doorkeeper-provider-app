@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Api::V1::CredentialsController do
   describe 'GET #me (integrated)' do
     let!(:application) { Doorkeeper::Application.create!(:name => "MyApp", :redirect_uri => "http://app.com") }
-    let!(:user) { User.create!(:email => "ax@b.com", :password => "abc123", :password_confirmation => "abc123") }
+    let!(:user) { User.create!(:email => "ax@b.com", :password => "abcde123", :password_confirmation => "abcde123") }
     let!(:token) { Doorkeeper::AccessToken.create! :application_id => application.id, :resource_owner_id => user.id }
 
     it 'responds with 200' do
@@ -15,6 +15,21 @@ describe Api::V1::CredentialsController do
       get :me, :format => :json, :access_token => token.token
       response.body.should == user.to_json
     end
+  end
+
+  describe 'GET #me (single-sign-on)' do
+    let!(:user) { User.create!(:email => "ax@b.com", :password => "abcde123", :password_confirmation => "abcde123") }
+
+    it 'responds with 200' do
+      get :me, :format => :json, :auth_token => user.authentication_token
+      response.status.should eq(200)
+    end
+
+    it 'returns the user as json' do
+      get :me, :format => :json, :auth_token => user.authentication_token
+      response.body.should == user.to_json
+    end
+
   end
 
   describe 'GET #me (stubbed)' do
